@@ -1,20 +1,28 @@
 // libryries imports
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
+import React, { useReducer } from 'react';
+import { DateRangeInput } from '@datepicker-react/styled'
 import { useDispatch  } from 'react-redux';
 // styles imports
-import 'react-datepicker/dist/react-datepicker.css';
 import * as Styled from './styles';
+import * as Global from  '../../styles/global-components';
 // redux imports
-import { changeDateFilter } from '../../features/dateFilter';
-
+import { changeStartDate } from '../../features/startDateFilter';
+import { changeEndDate } from '../../features/endDateFilter';
 
 export const DatePickers = () => {
-  //hooks
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const dispatch = useDispatch();
+  // simple consts
+  const startDate = new Date();
+  const endDate = new Date();
 
+  // hooks
+  // hook used to set initial states of daterange
+  const dispatch = useDispatch();
+  const [state, dispatchs] = useReducer(reducer, {
+    startDate:startDate,
+    endDate:endDate,
+    focusedInput:null
+  });
+ 
   // function to format date to api query format date(yy-mm-dd)
   function formatDate(date, format) {
     const map = {
@@ -23,10 +31,8 @@ export const DatePickers = () => {
         yy: date.getFullYear().toString().slice(-2),
         yyyy: date.getFullYear()
     };
-
     return format.replace(/mm|dd|yy|yyy/gi, matched => map[matched]);
   }
-
 
   /** function to send current startDate to redux
   *   every time that the current startDate changes
@@ -34,8 +40,7 @@ export const DatePickers = () => {
   function handlerStartDatePicker(date){
     // call function to format the date to 'yy-mm-dd'
     const data = formatDate(date, 'yy-mm-dd');
-    setStartDate(date);
-    dispatch(changeDateFilter(data));
+    dispatch(changeStartDate(data));
   }
 
   /** function to send current endDate to redux
@@ -44,27 +49,40 @@ export const DatePickers = () => {
   function handlerEndDatePicker(date){
     // call function to format the date to 'yy-mm-dd'
     const data = formatDate(date, 'yy-mm-dd');
-    setEndDate(date);
-    dispatch(changeDateFilter(data));
+    dispatch(changeEndDate(data));
   }
 
- 
+// sets the focus and change data actions and when change the data send to redux
+  function reducer(state, action) {
+    switch (action.type) {
+      case 'focusChange':
+        return { ...state, focusedInput: action.payload};
+      case 'dateChange' :
+        handlerStartDatePicker(action.payload.startDate);
+        handlerEndDatePicker(action.payload.endDate);
+        return action.payload;
+      default:
+        throw new Error()
+    }
+  }
+
   return (
-    <Styled.Container>
-      <DatePicker
-        selected={startDate}
-        onChange={date => handlerStartDatePicker(date)}
-        filterDate={date => date.getDay() !== 6 && date.getDay() !== 0}
-        showYearDropdown
-        scrollableYearDropdown
-      />
-      <DatePicker
-        selected={endDate}
-        onChange={date => handlerEndDatePicker(date)}
-        filterDate={date => date.getDay() !== 6 && date.getDay() !== 0}
-        showYearDropdown
-        scrollableYearDropdown
-      />
-    </Styled.Container>
+    <Global.Container
+        display={"flex"}
+        justify={"center"}
+        align={"center"}
+        padding={"10px"}
+        >
+          <Styled.Container>
+              <DateRangeInput
+                onFocusChange={focusedInput => dispatchs({type: 'focusChange', payload: focusedInput})}
+                startDate={state.startDate}
+                endDate={state.endDate}
+                displayFormat={"dd/MM/yyyy"}
+                onDatesChange={data => dispatchs({type: 'dateChange', payload: data})}
+                focusedInput={state.focusedInput} 
+              />  
+          </Styled.Container>
+    </Global.Container>
   )
 }

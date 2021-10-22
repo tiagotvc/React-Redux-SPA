@@ -1,8 +1,6 @@
 import { createGlobalStyle} from 'styled-components';
 
 export const GlobalStyles = createGlobalStyle`
-
-@import url('https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Gluten:wght@100;200;300;400;500;600;700;800;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Luckiest+Guy&display=swap');
   
 * {
     margin: 0;

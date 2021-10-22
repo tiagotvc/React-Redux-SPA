@@ -11,13 +11,15 @@ import { theme } from "./styles/theme";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import serviceOrdersReducer from './features/serviceOrders';
-import dateFilterReducer from './features/dateFilter';
+import startDateReducer from './features/startDateFilter';
+import endDateReducer from './features/endDateFilter';
+
 
 const store = configureStore({
   reducer: {
     serviceOrders: serviceOrdersReducer,
-    dateFilter: dateFilterReducer,
-
+    startDate: startDateReducer,
+    endDate: endDateReducer,
   },
 });
 
